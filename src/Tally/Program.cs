@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
+using System.Text;
 using Tally;
 
 // tally [file...]: prints lines, words and characters for each file, or for standard input.
 if (args.Length == 0)
 {
-    string text = Console.In.ReadToEnd();
+    using var input = new StreamReader(Console.OpenStandardInput(), Encoding.UTF8);
+    string text = input.ReadToEnd();
     Console.WriteLine($"{Counter.Lines(text)} {Counter.Words(text)} {Counter.Characters(text)}");
     return 0;
 }

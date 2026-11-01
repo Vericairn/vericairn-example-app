@@ -15,6 +15,8 @@ printf 'one two\nthree' | tally
 
 For each file, `tally` prints `lines words characters path`, in argument order. With no file arguments, it reads standard input and prints `lines words characters`. The counts are separated by single spaces.
 
+Files and standard input default to UTF-8 decoding on every platform, including Windows. A leading byte-order mark selects the encoding and is not counted as text.
+
 - **Lines**: the number of line breaks (`\n`), plus one for a final line without a line break.
 - **Words**: runs of non-whitespace characters. Spaces, tabs, line breaks and other Unicode whitespace separate words.
 - **Characters**: Unicode scalar values, including whitespace and line breaks. For example, `😀` counts as one character; an `e` followed by a combining accent counts as two. A Windows line ending (`\r\n`) contributes two characters and one line break.

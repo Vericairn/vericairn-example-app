@@ -19,6 +19,7 @@ public sealed class CliTests : IDisposable
         { "\n\n", "2 0 2" },
         { " \t\r\n", "1 0 4" },
         { "café\u00a0世界 \U0001F600\n", "1 3 10" },
+        { "café\u00a0世界 \U0001F600", "1 3 9" },
         { "e\u0301", "1 1 2" }
     };
 
@@ -30,6 +31,16 @@ public sealed class CliTests : IDisposable
 
         Assert.Equal(0, result.ExitCode);
         Assert.Equal($"{counts}{Environment.NewLine}", result.Output);
+        Assert.Empty(result.Error);
+    }
+
+    [Fact]
+    public async Task StandardInputRecognizesUtf8ByteOrderMark()
+    {
+        var result = await RunAsync("\ufeffcafé\u00a0世界 \U0001F600");
+
+        Assert.Equal(0, result.ExitCode);
+        Assert.Equal($"1 3 9{Environment.NewLine}", result.Output);
         Assert.Empty(result.Error);
     }
 
