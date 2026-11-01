@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
+using System.Text;
 using Tally;
 
-// tally [file...]: prints the number of lines in each file, or in standard input when no file is named.
+// tally [file...]: prints lines, words and characters for each file, or for standard input.
 if (args.Length == 0)
 {
-    Console.WriteLine(Counter.Lines(Console.In.ReadToEnd()));
+    using var input = new StreamReader(Console.OpenStandardInput(), Encoding.UTF8);
+    string text = input.ReadToEnd();
+    Console.WriteLine($"{Counter.Lines(text)} {Counter.Words(text)} {Counter.Characters(text)}");
     return 0;
 }
 
@@ -13,7 +16,8 @@ foreach (string path in args)
 {
     try
     {
-        Console.WriteLine($"{Counter.Lines(File.ReadAllText(path))} {path}");
+        string text = File.ReadAllText(path);
+        Console.WriteLine($"{Counter.Lines(text)} {Counter.Words(text)} {Counter.Characters(text)} {path}");
     }
     catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
     {
