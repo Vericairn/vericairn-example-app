@@ -1,23 +1,26 @@
 // SPDX-License-Identifier: Apache-2.0
 using System.Text;
+using System.Text.Json;
 using Tally;
 
-// tally [file...]: prints lines, words and characters for each file, or for standard input.
-if (args.Length == 0)
+// tally [--json] [file...]: prints counts for each file, or for standard input.
+bool json = args.Contains("--json");
+string[] paths = args.Where(argument => argument != "--json").ToArray();
+if (paths.Length == 0)
 {
     using var input = new StreamReader(Console.OpenStandardInput(), Encoding.UTF8);
     string text = input.ReadToEnd();
-    Console.WriteLine($"{Counter.Lines(text)} {Counter.Words(text)} {Counter.Characters(text)}");
+    PrintCounts(text, null, json);
     return 0;
 }
 
 int exit = 0;
-foreach (string path in args)
+foreach (string path in paths)
 {
     try
     {
         string text = File.ReadAllText(path);
-        Console.WriteLine($"{Counter.Lines(text)} {Counter.Words(text)} {Counter.Characters(text)} {path}");
+        PrintCounts(text, path, json);
     }
     catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
     {
@@ -27,3 +30,20 @@ foreach (string path in args)
 }
 
 return exit;
+
+static void PrintCounts(string text, string? path, bool json)
+{
+    long lines = Counter.Lines(text);
+    long words = Counter.Words(text);
+    long characters = Counter.Characters(text);
+    if (json)
+    {
+        Console.WriteLine(JsonSerializer.Serialize(new { path, lines, words, characters }));
+    }
+    else
+    {
+        Console.WriteLine(path is null
+            ? $"{lines} {words} {characters}"
+            : $"{lines} {words} {characters} {path}");
+    }
+}
